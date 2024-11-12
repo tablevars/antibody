@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { genFileId } from 'element-plus'
 import type { UploadUserFile, UploadInstance, UploadProps, UploadRawFile } from 'element-plus'
-import { compareSheet,  writeToFile } from './marge'
+import { compareSheet, writeToFile } from './marge'
 
 const fileList = ref<UploadUserFile[]>([])
 const upload = ref<UploadInstance>()
@@ -18,12 +18,15 @@ const handleExceed: UploadProps['onExceed'] = (files) => {
 }
 
 const submitUpload = () => {
-  compareSheet(fileList.value[0].raw).then((res) => {
-    newItems.value = res.newItems
-    onlineItems.value = res.onlineItems
+  if (fileList.value.length && fileList.value[0].raw)
+    compareSheet(fileList.value[0].raw).then((res) => {
+      res.newItems.sort((a, b) => (a < b ? -1 : 1))
+      newItems.value = res.newItems
+      res.onlineItems.sort((a, b) => (a < b ? -1 : 1))
+      onlineItems.value = res.onlineItems
 
-    writeToFile(res.mergedRowsReason)
-  })
+      writeToFile(res.mergedRowsReason)
+    })
 }
 </script>
 
